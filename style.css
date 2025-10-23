@@ -73,6 +73,24 @@ a { color: inherit; text-decoration: none; }
 .menu a:hover { opacity: 1; border-bottom-color: var(--sage); }
 .menu a.active { border-bottom-color: var(--sage); opacity: 1; }
 
+/* Accessibility utility */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+/* Mobile nav toggle button - hidden by default (desktop) */
+.mobile-nav-toggle {
+  display: none; /* show only on mobile via media query */
+  background: transparent;
+  border: 0;
+  padding: 8px;
+  border-radius: 8px;
+  color: var(--cocoa);
+  cursor: pointer;
+}
+.mobile-nav-toggle:focus { outline: 2px solid var(--sage); }
+
+/* Menu visibility controlled by data-visible on mobile */
+.menu { display: flex; align-items: center; }
+
 /* --- Panel layout --- */
 .panel {
   min-height: calc(100vh - var(--navH));
@@ -186,7 +204,7 @@ h2 { font-size: 40px; margin: 0 0 18px; }
 
 /* --- Grid helpers --- */
 .grid { display: grid; gap: 20px; }
-.grid.cards { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.grid.cards { grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); }
 .grid.two { grid-template-columns: 1fr 1fr; gap: 12px; }
 
 /* --- Skills chips --- */
@@ -224,12 +242,12 @@ h2 { font-size: 40px; margin: 0 0 18px; }
 }
 
 /* --- Achievements timeline --- */
-.timeline { border-left: 2px solid var(--taupe); padding-left: 16px; }
+.timeline { border-left: 2px solid var(--taupe); padding-left: 22px; }
 .tl-item { margin: 0 0 16px; position: relative; }
 .tl-item::before {
   content: "";
   position: absolute;
-  left: -10px; top: 6px;
+  left: -14px; top: 6px;
   width: 12px; height: 12px;
   background: var(--sage);
   border-radius: 50%;
@@ -265,6 +283,58 @@ footer { margin: 20px 0 30px; text-align: center; color: #837c76; }
 @media (max-width: 900px) {
   .hero { grid-template-columns: 1fr; }
   .grid.two { grid-template-columns: 1fr; }
+
+  /* Show mobile nav toggle on small screens */
+  .mobile-nav-toggle { display: inline-flex; align-items: center; justify-content: center; background: var(--sage); color: #fff; padding: 8px; border-radius: 10px; box-shadow: 0 6px 18px rgba(56,63,33,0.12); }
+
+  /* Mobile: themed menu panel (uses color variables) */
+  .nav-inner { position: relative; }
+
+  /* Keep layout ready (flex column), but hide visually using transform/opacity so we can animate */
+  .menu {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 220px;
+    max-width: 320px;
+    position: absolute;
+    right: 18px;
+    top: calc(var(--navH) + 8px);
+    padding: 14px;
+    border-radius: 12px;
+    background: linear-gradient(180deg, var(--beige), var(--cream));
+    border: 1px solid var(--taupe);
+    box-shadow: 0 14px 40px rgba(60,50,40,0.12);
+    transform-origin: top right;
+    transform: scale(.98);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 220ms cubic-bezier(.2,.9,.2,1), opacity 180ms ease-in-out;
+    z-index: 40;
+  }
+
+  /* When visible, show the panel using opacity/scale (smooth) */
+  .menu[data-visible="true"] {
+    transform: scale(1);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Links: use theme colors and comfortable tappable area */
+  .menu a { margin-left: 0; display: block; padding: 10px 12px; border-radius: 8px; color: var(--cocoa); font-weight: 700; }
+  .menu a:hover { background: rgba(56,63,33,0.06); color: var(--sage); }
+
+  /* Make the panel full-width on very small screens */
+  @media (max-width: 420px) {
+    .menu { left: 12px; right: 12px; min-width: auto; max-width: none; }
+    .mobile-nav-toggle { padding: 10px; border-radius: 12px; }
+  }
+
+  /* Mobile: hide/show nav on scroll (translate) */
+  /* Keep nav visible on scroll — classes left as no-op to prevent hiding */
+  .nav { transition: box-shadow 220ms ease; }
+  .nav.nav-hidden { transform: none !important; }
+  .nav.nav-pinned { box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
 }
 /* === About: graphic + collage (with shake animation) === */
 .about-grid {
@@ -646,3 +716,5 @@ footer { margin: 20px 0 30px; text-align: center; color: #837c76; }
   .contact-info h2 {
     font-size: 40px;
   }
+
+}
